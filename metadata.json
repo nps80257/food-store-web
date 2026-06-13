@@ -1,0 +1,6 @@
+{
+  "name": "Food Store Admin Dashboard",
+  "description": "食品店家網站後台管理系統，可管理店名、地址、電話、營業時間、空位狀態與最後更新時間等資訊，並包含視覺化的狀態看板與搜尋篩選功能。",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
