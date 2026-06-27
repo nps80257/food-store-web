@@ -1023,51 +1023,6 @@ export default function App() {
       </AnimatePresence>
 
       {/* MAIN CONTAINER */}
-      <main className="flex-1 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 w-full space-y-6 animate-fade-in" id="dashboard-main">
-        
-        {/* 頂部極簡視圖控制切換器 (極致美觀、無干擾、具備現代感) */}
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 bg-white dark:bg-zinc-900 p-4 rounded-2xl border border-zinc-200/80 dark:border-zinc-800/85 shadow-xs" id="view-mode-selector">
-          <div className="flex items-center gap-3">
-            <div className="w-9 h-9 bg-amber-500 rounded-xl flex items-center justify-center text-white text-lg shadow-xs shrink-0 font-bold">
-              🍛
-            </div>
-            <div>
-              <h1 className="text-base font-extrabold text-zinc-900 dark:text-white tracking-tight flex items-center gap-2">
-                Veyra 零感排隊行控中心 Live
-                <span className="text-[10px] bg-amber-100 dark:bg-amber-955/60 text-amber-600 dark:text-amber-400 font-bold px-2.5 py-0.5 rounded-full uppercase tracking-wider">
-                  多端並行控制網
-                </span>
-              </h1>
-              <p className="text-[11px] text-zinc-500 dark:text-zinc-400">
-                店家獨立帳號、自服務註冊相片上傳、一鍵秒級更動座位與預約狀況。
-              </p>
-            </div>
-          </div>
-
-          <div className="bg-zinc-100 dark:bg-zinc-950 p-1 rounded-xl flex items-center gap-1 border border-zinc-200/50 dark:border-zinc-850 shadow-xs shrink-0">
-            <button
-              onClick={() => handleViewModeChange('store-portal')}
-              className={`px-4 py-1.5 rounded-lg text-xs font-extrabold transition-all cursor-pointer flex items-center gap-1.5 ${
-                viewMode === 'store-portal'
-                  ? 'bg-white dark:bg-zinc-900 text-amber-600 dark:text-amber-400 shadow-sm border border-zinc-200/40 dark:border-zinc-805'
-                  : 'text-zinc-500 hover:text-zinc-800 dark:text-zinc-400 dark:hover:text-zinc-200'
-              }`}
-            >
-              🏪 店家管理專區
-            </button>
-            <button
-              onClick={() => handleViewModeChange('platform')}
-              className={`px-4 py-1.5 rounded-lg text-xs font-extrabold transition-all cursor-pointer flex items-center gap-1.5 ${
-                viewMode === 'platform'
-                  ? 'bg-white dark:bg-zinc-900 text-amber-600 dark:text-amber-400 shadow-sm border border-zinc-200/40 dark:border-zinc-805'
-                  : 'text-zinc-500 hover:text-zinc-800 dark:text-zinc-400 dark:hover:text-zinc-200'
-              }`}
-            >
-              🌐 總平台管理員
-            </button>
-          </div>
-        </div>
-
         {/* ==================== 1. 店家獨立經營端 (店家後台) ==================== */}
         {viewMode === 'store-portal' && (
           <div className="space-y-6" id="owner-terminal-scope">
