@@ -15,6 +15,14 @@ interface StoreFormProps {
     ownerUsername?: string;
     ownerPassword?: string;
     customImage?: string;
+    availableSeats?: number;
+    maxSeats?: number;
+    seatsCount1?: number;
+    seatsCount2?: number;
+    seatsCount3?: number;
+    seatsCount4?: number;
+    seatsCount5?: number;
+    estimatedWaitMinutes?: number;
   }) => void;
   onCancel: () => void;
 }
@@ -28,6 +36,16 @@ export default function StoreForm({ store, onSave, onCancel }: StoreFormProps) {
   const [notes, setNotes] = useState('');
   const [imageCategory, setImageCategory] = useState('ramen');
   
+  // New States: Seats and wait times
+  const [availableSeats, setAvailableSeats] = useState(8);
+  const [maxSeats, setMaxSeats] = useState(15);
+  const [seatsCount1, setSeatsCount1] = useState(3);
+  const [seatsCount2, setSeatsCount2] = useState(4);
+  const [seatsCount3, setSeatsCount3] = useState(1);
+  const [seatsCount4, setSeatsCount4] = useState(1);
+  const [seatsCount5, setSeatsCount5] = useState(0);
+  const [estimatedWaitMinutes, setEstimatedWaitMinutes] = useState(15);
+
   // New States: Credentials
   const [ownerUsername, setOwnerUsername] = useState('');
   const [ownerPassword, setOwnerPassword] = useState('');
@@ -51,6 +69,14 @@ export default function StoreForm({ store, onSave, onCancel }: StoreFormProps) {
       setOwnerUsername(store.ownerUsername || '');
       setOwnerPassword(store.ownerPassword || '');
       setCustomImage(store.customImage || '');
+      setAvailableSeats(store.availableSeats !== undefined ? store.availableSeats : 8);
+      setMaxSeats(store.maxSeats !== undefined ? store.maxSeats : 15);
+      setSeatsCount1(store.seatsCount1 !== undefined ? store.seatsCount1 : 3);
+      setSeatsCount2(store.seatsCount2 !== undefined ? store.seatsCount2 : 4);
+      setSeatsCount3(store.seatsCount3 !== undefined ? store.seatsCount3 : 1);
+      setSeatsCount4(store.seatsCount4 !== undefined ? store.seatsCount4 : 1);
+      setSeatsCount5(store.seatsCount5 !== undefined ? store.seatsCount5 : 0);
+      setEstimatedWaitMinutes(store.estimatedWaitMinutes !== undefined ? store.estimatedWaitMinutes : 15);
     } else {
       // Reset & pre-populate basic admin credentials
       setName('');
@@ -63,6 +89,14 @@ export default function StoreForm({ store, onSave, onCancel }: StoreFormProps) {
       setOwnerUsername('');
       setOwnerPassword('');
       setCustomImage('');
+      setAvailableSeats(8);
+      setMaxSeats(15);
+      setSeatsCount1(3);
+      setSeatsCount2(4);
+      setSeatsCount3(1);
+      setSeatsCount4(1);
+      setSeatsCount5(0);
+      setEstimatedWaitMinutes(15);
     }
   }, [store]);
 
@@ -181,6 +215,14 @@ export default function StoreForm({ store, onSave, onCancel }: StoreFormProps) {
       ownerUsername: finalUser,
       ownerPassword: finalPass,
       customImage,
+      availableSeats: Number(availableSeats) || 0,
+      maxSeats: Number(maxSeats) || 0,
+      seatsCount1: Number(seatsCount1) || 0,
+      seatsCount2: Number(seatsCount2) || 0,
+      seatsCount3: Number(seatsCount3) || 0,
+      seatsCount4: Number(seatsCount4) || 0,
+      seatsCount5: Number(seatsCount5) || 0,
+      estimatedWaitMinutes: Number(estimatedWaitMinutes) || 0,
     });
   };
 
@@ -523,6 +565,205 @@ export default function StoreForm({ store, onSave, onCancel }: StoreFormProps) {
               <span className="text-lg">🔴</span>
               <span className="text-xs mt-1">客滿</span>
             </label>
+          </div>
+        </div>
+
+        {/* 🚀 新增：座位數與客滿等待時間設定 (直覺的高級 UI) */}
+        <div className="bg-zinc-50 dark:bg-zinc-950/60 border border-zinc-150 dark:border-zinc-800 rounded-2xl p-4.5 space-y-4">
+          <h4 className="text-xs font-bold text-amber-500 uppercase tracking-widest flex items-center gap-1.5">
+            <span>🪑 店內座位與預估排隊設定</span>
+          </h4>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            {/* 總座位數 */}
+            <div>
+              <label className="block text-[11px] font-bold text-zinc-500 mb-1.5 uppercase">店內總座位數 (硬體上限)</label>
+              <div className="flex items-center gap-2">
+                <input 
+                  type="number"
+                  min="1"
+                  max="200"
+                  value={maxSeats}
+                  onChange={(e) => {
+                    const newMax = Math.max(1, Number(e.target.value) || 0);
+                    setMaxSeats(newMax);
+                    if (availableSeats > newMax) {
+                      setAvailableSeats(newMax);
+                    }
+                  }}
+                  className="w-full text-xs px-3 py-2 border border-zinc-200 dark:border-zinc-800 rounded-lg bg-white dark:bg-zinc-900 focus:outline-none focus:ring-1 focus:ring-amber-500 text-zinc-900 dark:text-zinc-50"
+                />
+                <span className="text-xs text-zinc-400 shrink-0">席次</span>
+              </div>
+            </div>
+
+            {/* 目前空位數 (支援加減) */}
+            <div>
+              <label className="block text-[11px] font-bold text-zinc-500 mb-1.5 uppercase">
+                當前可用空位數 ({availableSeats} 席)
+              </label>
+              <div className="flex items-center gap-1.5">
+                <button
+                  type="button"
+                  onClick={() => {
+                    const nextVal = Math.max(0, availableSeats - 1);
+                    setAvailableSeats(nextVal);
+                    // 根據空位數自動更新對應狀態：若 0 -> 客滿；一兩位 -> 快客滿；較多 -> 有空位
+                    if (nextVal === 0) {
+                      setStatus('full');
+                    } else if (nextVal <= Math.ceil(maxSeats * 0.25)) {
+                      setStatus('almost-full');
+                    } else {
+                      setStatus('available');
+                    }
+                  }}
+                  className="w-9 h-9 bg-zinc-200 dark:bg-zinc-800 hover:bg-zinc-300 dark:hover:bg-zinc-700 rounded-lg flex items-center justify-center font-black text-sm text-zinc-700 dark:text-zinc-200 cursor-pointer transition-all active:scale-90"
+                >
+                  －
+                </button>
+                <input 
+                  type="number"
+                  min="0"
+                  max={maxSeats}
+                  value={availableSeats}
+                  onChange={(e) => {
+                    const val = Math.min(maxSeats, Math.max(0, Number(e.target.value) || 0));
+                    setAvailableSeats(val);
+                    if (val === 0) {
+                      setStatus('full');
+                    } else if (val <= Math.ceil(maxSeats * 0.25)) {
+                      setStatus('almost-full');
+                    } else {
+                      setStatus('available');
+                    }
+                  }}
+                  className="w-16 text-center text-xs py-1.5 border border-zinc-200 dark:border-zinc-800 rounded-lg bg-white dark:bg-zinc-900 focus:outline-none focus:ring-1 focus:ring-amber-500 text-zinc-900 dark:text-zinc-50"
+                />
+                <button
+                  type="button"
+                  onClick={() => {
+                    const nextVal = Math.min(maxSeats, availableSeats + 1);
+                    setAvailableSeats(nextVal);
+                    if (nextVal === 0) {
+                      setStatus('full');
+                    } else if (nextVal <= Math.ceil(maxSeats * 0.25)) {
+                      setStatus('almost-full');
+                    } else {
+                      setStatus('available');
+                    }
+                  }}
+                  className="w-9 h-9 bg-zinc-200 dark:bg-zinc-800 hover:bg-zinc-300 dark:hover:bg-zinc-700 rounded-lg flex items-center justify-center font-black text-sm text-zinc-700 dark:text-zinc-200 cursor-pointer transition-all active:scale-90"
+                >
+                  ＋
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {/* 各規格桌位數量細部配置 */}
+          <div className="pt-3.5 border-t border-zinc-150 dark:border-zinc-850/80 space-y-2">
+            <label className="block text-[11px] font-bold text-zinc-500 uppercase tracking-wider">
+              🪑 營業各規格席次配置 (餐桌/櫃檯座規格數量)
+            </label>
+            <div className="grid grid-cols-2 xs:grid-cols-3 sm:grid-cols-5 gap-2.5">
+              <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl p-2.5">
+                <span className="text-[10px] font-medium text-zinc-500 block mb-1 text-center font-semibold">1 人吧檯座</span>
+                <input 
+                  type="number"
+                  min="0"
+                  value={seatsCount1}
+                  onChange={(e) => setSeatsCount1(Math.max(0, Number(e.target.value) || 0))}
+                  className="w-full text-xs text-center font-mono py-1 border border-zinc-200 dark:border-zinc-850 rounded bg-zinc-50/50 dark:bg-zinc-950 text-zinc-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-amber-500"
+                />
+              </div>
+              <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl p-2.5">
+                <span className="text-[10px] font-medium text-zinc-500 block mb-1 text-center font-semibold">2 人雙人位</span>
+                <input 
+                  type="number"
+                  min="0"
+                  value={seatsCount2}
+                  onChange={(e) => setSeatsCount2(Math.max(0, Number(e.target.value) || 0))}
+                  className="w-full text-xs text-center font-mono py-1 border border-zinc-200 dark:border-zinc-850 rounded bg-zinc-50/50 dark:bg-zinc-950 text-zinc-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-amber-500"
+                />
+              </div>
+              <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl p-2.5">
+                <span className="text-[10px] font-medium text-zinc-500 block mb-1 text-center font-semibold">3 人普通座</span>
+                <input 
+                  type="number"
+                  min="0"
+                  value={seatsCount3}
+                  onChange={(e) => setSeatsCount3(Math.max(0, Number(e.target.value) || 0))}
+                  className="w-full text-xs text-center font-mono py-1 border border-zinc-200 dark:border-zinc-850 rounded bg-zinc-50/50 dark:bg-zinc-950 text-zinc-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-amber-500"
+                />
+              </div>
+              <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl p-2.5">
+                <span className="text-[10px] font-semibold text-zinc-500 block mb-1 text-center">4 人家庭座</span>
+                <input 
+                  type="number"
+                  min="0"
+                  value={seatsCount4}
+                  onChange={(e) => setSeatsCount4(Math.max(0, Number(e.target.value) || 0))}
+                  className="w-full text-xs text-center font-mono py-1 border border-zinc-200 dark:border-zinc-850 rounded bg-zinc-50/50 dark:bg-zinc-950 text-zinc-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-amber-500"
+                />
+              </div>
+              <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl p-2.5">
+                <span className="text-[10px] font-semibold text-zinc-500 block mb-1 text-center">5人+大桌</span>
+                <input 
+                  type="number"
+                  min="0"
+                  value={seatsCount5}
+                  onChange={(e) => setSeatsCount5(Math.max(0, Number(e.target.value) || 0))}
+                  className="w-full text-xs text-center font-mono py-1 border border-zinc-200 dark:border-zinc-850 rounded bg-zinc-50/50 dark:bg-zinc-950 text-zinc-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-amber-500"
+                />
+              </div>
+            </div>
+            <p className="text-[10px] text-zinc-400 mt-1">
+              設定此門店擁有哪些桌型的最大承載桌數/座位量，方便排隊系統進行精準度匹配與候位分流。
+            </p>
+          </div>
+
+          {/* 預估排隊等待時間 */}
+          <div className="pt-2 border-t border-zinc-150 dark:border-zinc-850">
+            <label className="block text-[11px] font-bold text-zinc-500 mb-1.5 uppercase flex items-center gap-1">
+              <span>⏱️ 客滿時預估等待時間 ({status === 'full' ? '已啟用' : '有空位時暫不顯示'})</span>
+            </label>
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+              <div className="flex items-center gap-2 grow">
+                <input 
+                  type="number"
+                  min="0"
+                  max="180"
+                  placeholder="客滿時預估需要等待多少分鐘"
+                  value={estimatedWaitMinutes}
+                  onChange={(e) => setEstimatedWaitMinutes(Math.max(0, Number(e.target.value) || 0))}
+                  disabled={status !== 'full'}
+                  className="w-full text-xs px-3 py-2 border border-zinc-200 dark:border-zinc-800 rounded-lg bg-white dark:bg-zinc-900 focus:outline-none focus:ring-1 focus:ring-amber-500 text-zinc-900 dark:text-zinc-50 disabled:bg-zinc-105 disabled:dark:bg-zinc-950 disabled:text-zinc-400"
+                />
+                <span className="text-xs text-zinc-400 shrink-0">分鐘</span>
+              </div>
+              
+              {/* 快速時間選擇 */}
+              <div className="flex gap-1 items-center overflow-x-auto shrink-0 py-0.5">
+                {[10, 20, 30, 45, 60].map((t) => (
+                  <button
+                    type="button"
+                    key={t}
+                    onClick={() => setEstimatedWaitMinutes(t)}
+                    disabled={status !== 'full'}
+                    className={`text-[10px] px-2.5 py-1.5 rounded-md font-bold transition-all border ${
+                      estimatedWaitMinutes === t && status === 'full'
+                        ? 'bg-amber-500 text-white border-amber-500 shadow-sm'
+                        : 'bg-white dark:bg-zinc-900 text-zinc-650 dark:text-zinc-300 border-zinc-200 dark:border-zinc-800 hover:bg-zinc-50 dark:hover:bg-zinc-850'
+                    } disabled:opacity-50 disabled:pointer-events-none`}
+                  >
+                    {t}分
+                  </button>
+                ))}
+              </div>
+            </div>
+            <p className="text-[10px] text-zinc-400 mt-1.5">
+              當店家狀態標記為「客滿 🔴」時，此時間會呈現在顧客手機端網頁中，提供排隊者透明的時間預期。
+            </p>
           </div>
         </div>
 

@@ -1,6 +1,6 @@
 {
-  "name": "Food Store Admin Dashboard",
-  "description": "食品店家網站後台管理系統，可管理店名、地址、電話、營業時間、空位狀態與最後更新時間等資訊，並包含視覺化的狀態看板與搜尋篩選功能。",
+  "name": "Veyra - 餐飲排隊與空位平台",
+  "description": "Veyra 是一款現代化的餐飲空位狀態儀表板，專為食品店家開發的多端控制面板。提供實時空位、硬體席次編輯、營業時間、餐點主題與現場排隊狀態分析等功能。",
   "requestFramePermissions": [],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }

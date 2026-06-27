@@ -43,6 +43,7 @@ export default function LoginOrRegister({ stores, onLoginSuccess, onRegisterSucc
   const [regUsername, setRegUsername] = useState('');
   const [regPassword, setRegPassword] = useState('');
   const [regCustomImage, setRegCustomImage] = useState<string>('');
+  const [regMaxSeats, setRegMaxSeats] = useState<number>(15);
   
   // Interaction/Upload States
   const [isDragging, setIsDragging] = useState(false);
@@ -191,6 +192,21 @@ export default function LoginOrRegister({ stores, onLoginSuccess, onRegisterSucc
       ownerUsername: usernameInput,
       ownerPassword: passwordInput,
       customImage: regCustomImage,
+      maxSeats: regMaxSeats,
+      availableSeats: regMaxSeats, // initially defaults to all seats free
+      estimatedWaitMinutes: 15,
+      todayImpressions: 1,
+      todayClicks: 0,
+      favoritesCount: 0,
+      navigationCount: 0,
+      hourlyViews: {
+        '11:00': 0,
+        '12:00': 0,
+        '18:00': 0,
+        '19:00': 0,
+        '20:00': 0,
+        'other': 0
+      },
       lastUpdated: new Date().toISOString().replace('T', ' ').substring(0, 19)
     };
 
@@ -206,6 +222,7 @@ export default function LoginOrRegister({ stores, onLoginSuccess, onRegisterSucc
       setRegUsername('');
       setRegPassword('');
       setRegCustomImage('');
+      setRegMaxSeats(15);
     }, 1500);
   };
 
@@ -437,6 +454,22 @@ export default function LoginOrRegister({ stores, onLoginSuccess, onRegisterSucc
                       </option>
                     ))}
                   </select>
+                </div>
+
+                <div>
+                  <label className="block text-[10px] font-bold text-zinc-500 uppercase mb-1">店內總座位數 (硬體上限) <span className="text-rose-500">*</span></label>
+                  <div className="flex items-center gap-2">
+                    <input 
+                      type="number"
+                      required
+                      min="1"
+                      className="w-full text-xs px-3 py-2 border border-zinc-200 dark:border-zinc-800 rounded-lg bg-zinc-50 dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-1 focus:ring-amber-500 font-mono"
+                      placeholder="例如: 15"
+                      value={regMaxSeats}
+                      onChange={(e) => setRegMaxSeats(Math.max(1, Number(e.target.value) || 0))}
+                    />
+                    <span className="text-xs text-zinc-400 shrink-0">席次</span>
+                  </div>
                 </div>
               </div>
             </div>

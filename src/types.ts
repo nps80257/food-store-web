@@ -13,6 +13,31 @@ export interface FoodStore {
   ownerUsername?: string; // 店家管理員帳號
   ownerPassword?: string; // 店家管理員密碼
   customImage?: string;   // 店家上傳的自訂封面照片 (Base64格式)
+  availableSeats?: number; // 目前空位數
+  maxSeats?: number;       // 總座位數
+  seatsCount1?: number;    // 1人座總桌數/席數
+  seatsCount2?: number;    // 2人座總桌數/席數
+  seatsCount3?: number;    // 3人座總桌數/席數
+  seatsCount4?: number;    // 4人座總桌數/席數
+  seatsCount5?: number;    // 5人及以上總桌數/席數
+  estimatedWaitMinutes?: number; // 客滿時的預估等待時間（分鐘）
+  todayImpressions?: number; // 今日曝光數
+  todayClicks?: number;      // 今日點擊數
+  favoritesCount?: number;   // 收藏數
+  navigationCount?: number;  // 導航次數
+  hourlyViews?: {
+    '11:00': number;
+    '12:00': number;
+    '18:00': number;
+    '19:00': number;
+    '20:00': number;
+    'other': number;
+  };
+  statusLogs?: {
+    status: SeatStatus;
+    timestamp: string;
+    availableSeats: number;
+  }[];
 }
 
 export const STATUS_LABELS: Record<SeatStatus, { label: string; color: string; bg: string; border: string; bullet: string }> = {
